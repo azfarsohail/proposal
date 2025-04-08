@@ -123,6 +123,7 @@
         .btn-no {
             background: linear-gradient(45deg, #F44336, #E91E63);
             color: white;
+            transition: all 0.5s ease-out;
         }
         
         .btn:hover {
@@ -223,6 +224,25 @@
             animation: pulse 1s infinite alternate;
         }
         
+        .whatsapp-btn {
+            background: linear-gradient(45deg, #25D366, #128C7E);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        .whatsapp-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
         @keyframes pulse {
             from { transform: scale(1); }
             to { transform: scale(1.2); }
@@ -241,6 +261,10 @@
             .btn {
                 padding: 12px 25px;
                 font-size: 1rem;
+            }
+            
+            .celebration h1 {
+                font-size: 2rem;
             }
         }
     </style>
@@ -294,12 +318,12 @@
     
     <div class="scene hidden" id="proposal-scene-4">
         <div class="love-letter">
-            <h1>My Final Plea 💌</h1>
-            <p>Zainab, I've loved you through every "no" and will keep loving you no matter what. But please, give me this one chance to make you happy.</p>
+            <h1>My Final Please 💌</h1>
+            <p>ZAINAB, I've loved you through every "no" and will keep loving you no matter what. But please, give me this one chance to make you happy.</p>
             <p>Will you be mine, today and forever?</p>
             
             <div class="btn-container">
-                <button class="btn btn-yes" id="yes-btn-4">YES! 💍</button>
+                <button class="btn btn-yes" id="yes-btn-4">YES! 🤭</button>
                 <button class="btn btn-no" id="no-btn-4">Make me! 😝</button>
             </div>
             
@@ -310,9 +334,10 @@
     <!-- Celebration Scene -->
     <div class="celebration" id="celebration">
         <h1>YAY! SHE SAID YES! 🎉</h1>
-        <p>Zainab Siddiqui agreed to be mine! 💍</p>
+        <p>ZANUUU agreed to be mine! 💍</p>
         <div class="emoji">💖💘💝💗💓💞💕💟🎉🎊🎆</div>
         <p>This calls for celebration!</p>
+        <button class="whatsapp-btn" id="whatsapp-btn">i miss youuuuuuuuu unblock me <br> click here  💌</button>
         <p class="signature">The happiest man alive, S.M. Azfar</p>
     </div>
     
@@ -331,6 +356,7 @@
         // Game variables
         let currentScene = 1;
         const heartEmojis = ['💖', '💘', '💝', '💗', '💓', '💞', '💕', '💟'];
+        const whatsappNumber = '03110387727';
         
         // Initialize floating hearts
         function createFloatingHearts() {
@@ -352,6 +378,16 @@
             scenes[currentScene].classList.add('hidden');
             scenes[newScene].classList.remove('hidden');
             currentScene = newScene;
+            
+            // Make "No" buttons more difficult to click as scenes progress
+            if (newScene > 1) {
+                const noBtns = document.querySelectorAll('.btn-no');
+                noBtns.forEach(btn => {
+                    btn.addEventListener('mouseenter', function() {
+                        makeButtonRunAway(this);
+                    });
+                });
+            }
         }
         
         // Create confetti effect
@@ -385,7 +421,7 @@
             createConfetti();
             
             // Create floating emojis
-            const emojis = ['🎉', '💍', '💘', '🎊', '❤️', '🥳', '💞', '💐'];
+            const emojis = [🤍🖇️,'🪄','🫀','🫂','👀','🌹','💫','🌙','❤️'];
             for (let i = 0; i < 30; i++) {
                 setTimeout(() => {
                     const emoji = document.createElement('div');
@@ -403,14 +439,44 @@
             }
         }
         
-        // Make button run away
+        // Make button run away more dynamically
         function makeButtonRunAway(btn) {
             const maxX = window.innerWidth - btn.offsetWidth;
             const maxY = window.innerHeight - btn.offsetHeight;
             
+            // Calculate position away from cursor
+            const rect = btn.getBoundingClientRect();
+            const btnCenterX = rect.left + rect.width / 2;
+            const btnCenterY = rect.top + rect.height / 2;
+            
+            // Get mouse position from event (if available)
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            
+            // Calculate direction away from mouse
+            const angle = Math.atan2(btnCenterY - mouseY, btnCenterX - mouseX);
+            const distance = 200 + Math.random() * 100; // Move further away
+            
+            // Calculate new position
+            let newX = btnCenterX + Math.cos(angle) * distance;
+            let newY = btnCenterY + Math.sin(angle) * distance;
+            
+            // Keep within bounds
+            newX = Math.max(0, Math.min(maxX, newX - rect.width / 2));
+            newY = Math.max(0, Math.min(maxY, newY - rect.height / 2));
+            
             btn.style.position = 'absolute';
-            btn.style.left = Math.random() * maxX + 'px';
-            btn.style.top = Math.random() * maxY + 'px';
+            btn.style.left = newX + 'px';
+            btn.style.top = newY + 'px';
+            
+            // Add rotation effect
+            btn.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
+        }
+        
+        // Redirect to WhatsApp
+        function redirectToWhatsApp() {
+            const message = encodeURIComponent("I said YES! Let's talk 💖");
+            window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
         }
         
         // Event listeners for all yes buttons
@@ -444,9 +510,12 @@
             }, 1000);
         });
         
+        // WhatsApp button
+        document.getElementById('whatsapp-btn').addEventListener('click', redirectToWhatsApp);
+        
         // Make no buttons run away on hover after first click
         document.querySelectorAll('.btn-no').forEach(btn => {
-            btn.addEventListener('mouseover', function() {
+            btn.addEventListener('mouseenter', function() {
                 if (currentScene > 1) {
                     makeButtonRunAway(this);
                 }
@@ -469,4 +538,3 @@
     </script>
 </body>
 </html>
-<!-- edit ( the 'no' button appears next to 'yes' button on clicking on no the second page open dynamically with the new imotional loving romentic proposal if again she click on 'no' the 'no button' run away on every click until she click on yes -->
